@@ -6,6 +6,7 @@ const Project = require('../models/project-model')
 
 //Route to retrieve all projects 
 router.get('/projects', (req, res) => {
+  console.log('loggeduser', req.user); // This allows us to see, when we are logged in, which user in making the request.
   Project.find()
     .then((allProjectsFromDB) => {
         //res.render('projects', allProjectsFromDB) => avant on aurait fait cela.
@@ -52,5 +53,22 @@ router.delete('/projects/:id', (req, res) => {
     res.json({message: `Project with id ${req.params.id} was deleted`})
   })
 })
+
+
+router.post('/logout', (req, res) => {
+  req.logOut();
+  res.status(200).json({message: 'Log out success!'})
+})
+
+router.get('/loggedIn', (req, res) => {
+  if(req.isAuthenticated()) {
+    // some user is authenticated.
+    res.json(req.user);
+    return;
+  }
+  // No one is authenticated.
+  res.json({})
+})
+
 
 module.exports = router;

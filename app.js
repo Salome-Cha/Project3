@@ -8,10 +8,13 @@ const hbs          = require('hbs');
 const mongoose     = require('mongoose');
 const logger       = require('morgan');
 const path         = require('path');
-const cors         = require('cors')
+const cors         = require('cors');
+const session      = require('express-session');
+const passport     = require('passport');
+
+require('./configs/passport');
 
 
-// NEED TO BE CHANGED FOR OUR PROJECT:
 mongoose
   .connect('mongodb://localhost/project-management-server', {useNewUrlParser: true})
   .then(x => {
@@ -46,10 +49,17 @@ app.set('view engine', 'hbs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
+app.use(session({
+  secret: 'projectapp',
+  cookie: {expire: 60000},
+  rolling: true
+}))
 
+app.use(passport.initialize());
+app.use(passport.session())
 
 // default value for title local
-app.locals.title = 'Sorority';
+app.locals.title = 'Express - Generated with IronGenerator';
 
 // Allowing the frontend to get resources from the BE. This is essential for allowing FE to access our BE.
 // on met donc l'origin de FE le port 3000:
@@ -64,7 +74,6 @@ app.use(
 const index = require('./routes/index');
 app.use('/', index);
 
-// HAS TO BE CHANGED ------------------------------------------------------------------------------
 const projectManagementRoutes = require('./routes/project-routes')
 app.use('/api', projectManagementRoutes)
 
